@@ -189,7 +189,187 @@ var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
+},{"_css_loader":"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/css-loader.js"}],"js/utils.js":[function(require,module,exports) {
+"use strict";
+/**
+ * 汎用クラス
+ */
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Utils =
+/*#__PURE__*/
+function () {
+  function Utils() {
+    _classCallCheck(this, Utils);
+  }
+
+  _createClass(Utils, null, [{
+    key: "getRand",
+
+    /**
+     * min以上max未満の乱数を返す
+     */
+    value: function getRand(min, max) {
+      return Math.floor(Math.random() * (max - min)) + min;
+    }
+  }]);
+
+  return Utils;
+}();
+
+exports.default = Utils;
+},{}],"js/node-controller.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _utils = _interopRequireDefault(require("./utils"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/** ノード生存 */
+var ALIVE = true;
+/**
+ * ノード管理クラス
+ */
+
+var NodeController =
+/*#__PURE__*/
+function () {
+  /**
+   * コンストラクタ
+   */
+  function NodeController() {
+    _classCallCheck(this, NodeController);
+
+    this.nodeMap = [];
+    this.nodeSize = 0;
+  }
+  /**
+   * ノード行列初期化処理
+   * @param {*} windowWidth 画面の幅
+   * @param {*} windowHeight 画面の高さ
+   * @param {*} nodeSize ノードの1辺の長さ(px)
+   */
+
+
+  _createClass(NodeController, [{
+    key: "initialize",
+    value: function initialize(windowWidth, windowHeight, nodeSize) {
+      this.nodeSize = nodeSize;
+      var columnLength = Math.floor(windowWidth / nodeSize);
+      var rowLenght = Math.floor(windowHeight / nodeSize); //端の行列をダミーノードとして使うためノードの配列を実際の要素数+2の大きさで初期化
+
+      this.nodeMap = new Array(rowLenght);
+
+      for (var i = 0; i < rowLenght + 2; i++) {
+        this.nodeMap[i] = new Array(columnLength + 2).fill(false);
+      } //初期配置するノードをランダムに指定
+
+
+      var startAliveCount = Math.floor(columnLength * rowLenght * 4 / 10);
+
+      for (var _i = 0; _i < startAliveCount; _i++) {
+        var x = _utils.default.getRand(1, columnLength);
+
+        var y = _utils.default.getRand(1, rowLenght);
+
+        this.nodeMap[y][x] = ALIVE;
+      }
+    }
+    /**
+     * ノードを次世代に進める
+     */
+
+  }, {
+    key: "update",
+    value: function update() {
+      var nextNodeMap = new Array(this.nodeMap.length);
+
+      for (var i = 0; i < this.nodeMap.length; i++) {
+        nextNodeMap[i] = new Array(this.nodeMap[i].length).fill(false);
+      }
+
+      for (var _i2 = 1; _i2 < this.nodeMap.length - 1; _i2++) {
+        for (var j = 1; j < this.nodeMap[_i2].length - 1; j++) {
+          var aliveCount = this.countAliveNode(_i2, j);
+
+          if (!this.nodeMap[_i2][j]) {
+            nextNodeMap[_i2][j] = aliveCount === 3;
+            continue;
+          }
+
+          nextNodeMap[_i2][j] = aliveCount === 2 || aliveCount === 3;
+        }
+      }
+
+      this.nodeMap = Array.from(nextNodeMap);
+    }
+    /**
+     * 指定したノードの周囲の生存ノード数をカウント
+     * @param {*} y y座標
+     * @param {*} x x座標
+     * @returns 生存ノード数
+     */
+
+  }, {
+    key: "countAliveNode",
+    value: function countAliveNode(y, x) {
+      var count = 0;
+      count += this.nodeMap[y - 1][x - 1] ? 1 : 0;
+      count += this.nodeMap[y - 1][x] ? 1 : 0;
+      count += this.nodeMap[y - 1][x + 1] ? 1 : 0;
+      count += this.nodeMap[y][x - 1] ? 1 : 0;
+      count += this.nodeMap[y][x + 1] ? 1 : 0;
+      count += this.nodeMap[y + 1][x - 1] ? 1 : 0;
+      count += this.nodeMap[y + 1][x] ? 1 : 0;
+      count += this.nodeMap[y + 1][x + 1] ? 1 : 0;
+      return count;
+    }
+    /**
+     * ノードの行数を取得
+     */
+
+  }, {
+    key: "rowLength",
+    get: function get() {
+      return this.nodeMap.length;
+    }
+    /**
+     * ノードの列数を取得
+     */
+
+  }, {
+    key: "columnLength",
+    get: function get() {
+      return this.nodeMap.length === 0 ? 0 : this.nodeMap[0].length;
+    }
+  }]);
+
+  return NodeController;
+}();
+
+exports.default = NodeController;
+},{"./utils":"js/utils.js"}],"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/base64-js/index.js":[function(require,module,exports) {
 'use strict'
 
 exports.byteLength = byteLength
@@ -85779,16 +85959,24 @@ var process = require("process");
 
 require("../style/style.scss");
 
+var _nodeController = _interopRequireDefault(require("./node-controller"));
+
 var _p = _interopRequireDefault(require("p5"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/** 画面に描画する1ノードの1辺の長さ(px) */
+var NODE_SIZE = 10;
+/**
+ * p5.jsでキャンバス更新
+ * @param {*} p p5.jsモジュール
+ */
+
 var sketch = function sketch(p) {
   //画面描画用バッファ
-  var bufferedImage;
-  var NODE_SIZE = 10;
-  var ALIVE = true;
-  var nodeMap = [];
+  var bufferedImage; //ノード制御モジュール
+
+  var nodeController = new _nodeController.default();
 
   p.preload = function () {};
 
@@ -85800,13 +85988,14 @@ var sketch = function sketch(p) {
     p.background(0);
     p.frameRate(60);
     p.imageMode(p.CENTER);
-    p.initialize();
+    nodeController.initialize(p.windowWidth, p.windowHeight, NODE_SIZE);
   }; //画面描画処理
 
 
   p.draw = function () {
     //背景描画(前フレームの描画内容を塗りつぶす)
     bufferedImage.background(0);
+    var nodeMap = nodeController.nodeMap;
 
     for (var i = 1; i < nodeMap.length - 1; i++) {
       for (var j = 1; j < nodeMap[i].length - 1; j++) {
@@ -85818,49 +86007,7 @@ var sketch = function sketch(p) {
 
     p.image(bufferedImage, p.windowWidth / 2, p.windowHeight / 2); //次のフレームのノードの状態を設定
 
-    var nextNodeMap = new Array(nodeMap.length);
-
-    for (var _i = 0; _i < nodeMap.length; _i++) {
-      nextNodeMap[_i] = new Array(nodeMap[_i].length).fill(false);
-    }
-
-    for (var _i2 = 1; _i2 < nodeMap.length - 1; _i2++) {
-      for (var _j = 1; _j < nodeMap[_i2].length - 1; _j++) {
-        var aliveCount = p.countAliveNode(_i2, _j);
-
-        if (!nodeMap[_i2][_j]) {
-          nextNodeMap[_i2][_j] = aliveCount === 3;
-          continue;
-        }
-
-        nextNodeMap[_i2][_j] = aliveCount === 2 || aliveCount === 3;
-      }
-    }
-
-    nodeMap = Array.from(nextNodeMap);
-  };
-
-  p.countAliveNode = function (y, x) {
-    var count = 0;
-    count += nodeMap[y - 1][x - 1] ? 1 : 0;
-    count += nodeMap[y - 1][x] ? 1 : 0;
-    count += nodeMap[y - 1][x + 1] ? 1 : 0;
-    count += nodeMap[y][x - 1] ? 1 : 0;
-    count += nodeMap[y][x + 1] ? 1 : 0;
-    count += nodeMap[y + 1][x - 1] ? 1 : 0;
-    count += nodeMap[y + 1][x] ? 1 : 0;
-    count += nodeMap[y + 1][x + 1] ? 1 : 0;
-    return count;
-  };
-  /**
-   * min以上max未満の値をランダムに返す
-   * @param {*} min 最小値
-   * @param {*} max 最大値+1
-   */
-
-
-  p.getRand = function (min, max) {
-    return Math.floor(p.random(max - min)) + min;
+    nodeController.update();
   };
   /**
    * ウィンドウサイズ変更時イベント
@@ -85870,34 +86017,13 @@ var sketch = function sketch(p) {
   p.windowResized = function () {
     //変更されたウィンドウサイズに合わせてキャンバスのサイズを更新
     p.resizeCanvas(p.windowWidth, p.windowHeight);
-    p.initialize();
-  };
-
-  p.initialize = function () {
-    //ウィンドウサイズに合わせてライフゲームの行列数を決定
-    var columnLength = Math.floor(p.windowWidth / NODE_SIZE);
-    var rowLenght = Math.floor(p.windowHeight / NODE_SIZE); //端の行列をダミーノードとして使うためノードの配列を実際の要素数+2の大きさで初期化
-
-    nodeMap = new Array(rowLenght);
-
-    for (var i = 0; i < rowLenght + 2; i++) {
-      nodeMap[i] = new Array(columnLength + 2).fill(false);
-    }
-
-    var startAliveCount = Math.floor(columnLength * rowLenght * 4 / 10);
-
-    for (var _i3 = 0; _i3 < startAliveCount; _i3++) {
-      var x = p.getRand(1, columnLength);
-      var y = p.getRand(1, rowLenght);
-      nodeMap[y][x] = ALIVE;
-    }
-
-    bufferedImage.resizeCanvas(columnLength * 10, rowLenght * 10);
+    nodeController.initialize(p.windowWidth, p.windowHeight, NODE_SIZE);
+    bufferedImage.resizeCanvas(nodeController.columnLength * 10, nodeController.rowLength * 10);
   };
 };
 
 new _p.default(sketch);
-},{"../style/style.scss":"style/style.scss","p5":"../node_modules/p5/lib/p5.js"}],"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"../style/style.scss":"style/style.scss","./node-controller":"js/node-controller.js","p5":"../node_modules/p5/lib/p5.js"}],"C:/Users/tekur/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -85925,7 +86051,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "2808" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9799" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
