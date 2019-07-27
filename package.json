@@ -23,6 +23,7 @@
     "p5": "^0.9.0"
   },
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "sass": "^1.22.7"
   }
 }
