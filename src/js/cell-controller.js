@@ -33,7 +33,7 @@ export default class CellController {
         }
 
         //初期配置するセルをランダムに指定
-        const startAliveCount = Math.floor(columnLength * rowLenght * 4 / 10);
+        const startAliveCount = Math.floor(columnLength * rowLenght * 6 / 10);
         for (let i = 0; i < startAliveCount; i++) {
             const x = Utils.getRand(1, columnLength);
             const y = Utils.getRand(1, rowLenght);

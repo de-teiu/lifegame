@@ -286,7 +286,7 @@ function () {
       } //初期配置するセルをランダムに指定
 
 
-      var startAliveCount = Math.floor(columnLength * rowLenght * 4 / 10);
+      var startAliveCount = Math.floor(columnLength * rowLenght * 6 / 10);
 
       for (var _i = 0; _i < startAliveCount; _i++) {
         var x = _utils.default.getRand(1, columnLength);
