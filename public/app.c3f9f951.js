@@ -277,21 +277,21 @@ function () {
     value: function initialize(windowWidth, windowHeight, cellSize) {
       this.cellSize = cellSize;
       var columnLength = Math.floor(windowWidth / cellSize);
-      var rowLenght = Math.floor(windowHeight / cellSize); //端の行列をダミーセルとして使うためセルの配列を実際の要素数+2の大きさで初期化
+      var rowLength = Math.floor(windowHeight / cellSize); //端の行列をダミーセルとして使うためセルの配列を実際の要素数+2の大きさで初期化
 
-      this.cellMap = new Array(rowLenght);
+      this.cellMap = new Array(rowLength);
 
-      for (var i = 0; i < rowLenght + 2; i++) {
+      for (var i = 0; i < rowLength + 2; i++) {
         this.cellMap[i] = new Array(columnLength + 2).fill(false);
       } //初期配置するセルをランダムに指定
 
 
-      var startAliveCount = Math.floor(columnLength * rowLenght * 6 / 10);
+      var startAliveCount = Math.floor(columnLength * rowLength * 6 / 10);
 
       for (var _i = 0; _i < startAliveCount; _i++) {
-        var x = _utils.default.getRand(1, columnLength);
+        var x = _utils.default.getRand(1, columnLength - 1);
 
-        var y = _utils.default.getRand(1, rowLenght);
+        var y = _utils.default.getRand(1, rowLength - 1);
 
         this.cellMap[y][x] = ALIVE;
       }
@@ -100860,7 +100860,7 @@ var sketch = function sketch(p) {
     for (var i = 1; i < cellMap.length - 1; i++) {
       for (var j = 1; j < cellMap[i].length - 1; j++) {
         if (cellMap[i][j]) {
-          bufferedImage.rect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          bufferedImage.rect((j - 1) * CELL_SIZE, (i - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
       }
     } //次のフレームのセルの状態を設定

@@ -24,19 +24,19 @@ export default class CellController {
     initialize(windowWidth, windowHeight, cellSize) {
         this.cellSize = cellSize;
         const columnLength = Math.floor(windowWidth / cellSize);
-        const rowLenght = Math.floor(windowHeight / cellSize);
+        const rowLength = Math.floor(windowHeight / cellSize);
 
         //端の行列をダミーセルとして使うためセルの配列を実際の要素数+2の大きさで初期化
-        this.cellMap = new Array(rowLenght);
-        for (let i = 0; i < rowLenght + 2; i++) {
+        this.cellMap = new Array(rowLength);
+        for (let i = 0; i < rowLength + 2; i++) {
             this.cellMap[i] = new Array(columnLength + 2).fill(false);
         }
 
         //初期配置するセルをランダムに指定
-        const startAliveCount = Math.floor(columnLength * rowLenght * 6 / 10);
+        const startAliveCount = Math.floor(columnLength * rowLength * 6 / 10);
         for (let i = 0; i < startAliveCount; i++) {
-            const x = Utils.getRand(1, columnLength);
-            const y = Utils.getRand(1, rowLenght);
+            const x = Utils.getRand(1, columnLength - 1);
+            const y = Utils.getRand(1, rowLength - 1);
             this.cellMap[y][x] = ALIVE;
         }
     }

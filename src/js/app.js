@@ -67,7 +67,7 @@ const sketch = p => {
         for (let i = 1; i < cellMap.length - 1; i++) {
             for (let j = 1; j < cellMap[i].length - 1; j++) {
                 if (cellMap[i][j]) {
-                    bufferedImage.rect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                    bufferedImage.rect((j - 1) * CELL_SIZE, (i - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                 }
             }
         }
