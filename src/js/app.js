@@ -95,7 +95,7 @@ const sketch = p => {
             bufferedImage.fill(SOUND_CELL_COLOR);
             for (let i = 0; i < cellController.rowLength; i++) {
                 if (cellController.cellMap[i][nextLine]) {
-                    bufferedImage.rect(nextLine * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                    bufferedImage.rect((nextLine - 1) * CELL_SIZE, (i - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                 }
             }
         }

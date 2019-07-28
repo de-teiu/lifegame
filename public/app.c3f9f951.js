@@ -100890,7 +100890,7 @@ var sketch = function sketch(p) {
 
       for (var _i = 0; _i < cellController.rowLength; _i++) {
         if (cellController.cellMap[_i][nextLine]) {
-          bufferedImage.rect(nextLine * CELL_SIZE, _i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          bufferedImage.rect((nextLine - 1) * CELL_SIZE, (_i - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
       }
     }
