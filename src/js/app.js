@@ -87,7 +87,6 @@ const sketch = p => {
      * 効果音再生
      */
     p.playCellSound = (nextLine) => {
-        console.log("change");
         for (let i = 0; i < cellController.rowLength; i++) {
             if (cellController.cellMap[i][nextLine]) {
                 const freq = p.midiToFreq(Math.floor(i * 64 / cellController.rowLength) + 64);

@@ -100889,8 +100889,6 @@ var sketch = function sketch(p) {
 
 
   p.playCellSound = function (nextLine) {
-    console.log("change");
-
     for (var i = 0; i < cellController.rowLength; i++) {
       if (cellController.cellMap[i][nextLine]) {
         var freq = p.midiToFreq(Math.floor(i * 64 / cellController.rowLength) + 64);
