@@ -1,12 +1,12 @@
 "use strict";
 
 import "../style/style.scss";
-import NodeController from "./node-controller";
+import CellController from "./cell-controller";
 import P5 from "p5";
 import "p5/lib/addons/p5.sound";
 
-/** 画面に描画する1ノードの1辺の長さ(px) */
-const NODE_SIZE = 10;
+/** 画面に描画する1セルの1辺の長さ(px) */
+const CELL_SIZE = 10;
 
 /**
  * p5.jsでキャンバス更新
@@ -15,11 +15,11 @@ const NODE_SIZE = 10;
 const sketch = p => {
     //画面描画用バッファ
     let bufferedImage;
-    //ノード制御モジュール
-    const nodeController = new NodeController();
-    const NODE_COLOR = p.color(255, 255, 255);
+    //セル制御モジュール
+    const cellController = new CellController();
+    const CELL_COLOR = p.color(255, 255, 255);
     const SOUND_LINE_COLOR = p.color(255, 0, 0);
-    const SOUND_NODE_COLOR = p.color(0, 255, 0);
+    const SOUND_CELL_COLOR = p.color(0, 255, 0);
     let soundLineX = 0;
     let oscList = [];
     let envelopeList = [];
@@ -30,8 +30,8 @@ const sketch = p => {
         p.createCanvas(p.windowWidth, p.windowHeight);
         p.frameRate(30);
         p.imageMode(p.CENTER);
-        nodeController.initialize(p.windowWidth, p.windowHeight, NODE_SIZE);
-        bufferedImage = p.createGraphics((nodeController.columnLength - 2) * NODE_SIZE, (nodeController.rowLength - 2) * NODE_SIZE);
+        cellController.initialize(p.windowWidth, p.windowHeight, CELL_SIZE);
+        bufferedImage = p.createGraphics((cellController.columnLength - 2) * CELL_SIZE, (cellController.rowLength - 2) * CELL_SIZE);
         bufferedImage.noStroke();
         bufferedImage.fill(255);
 
@@ -46,49 +46,51 @@ const sketch = p => {
         //背景描画(前フレームの描画内容を塗りつぶす)
         p.background(0);
         bufferedImage.background(0);
-        bufferedImage.fill(NODE_COLOR);
+        bufferedImage.fill(CELL_COLOR);
         bufferedImage.noStroke();
-        const nodeMap = nodeController.nodeMap;
-        for (let i = 1; i < nodeMap.length - 1; i++) {
-            for (let j = 1; j < nodeMap[i].length - 1; j++) {
-                if (nodeMap[i][j]) {
-                    bufferedImage.rect(j * NODE_SIZE, i * NODE_SIZE, NODE_SIZE, NODE_SIZE)
+        const cellMap = cellController.cellMap;
+        for (let i = 1; i < cellMap.length - 1; i++) {
+            for (let j = 1; j < cellMap[i].length - 1; j++) {
+                if (cellMap[i][j]) {
+                    bufferedImage.rect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                 }
             }
         }
         bufferedImage.stroke(SOUND_LINE_COLOR);
         bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height);
 
-        //次のフレームのノードの状態を設定
-        nodeController.update();
-        let nextSoundLineX = soundLineX - NODE_SIZE / 10 * 2;
+        //次のフレームのセルの状態を設定
+        cellController.update();
+        let nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
         if (nextSoundLineX < 0) {
             nextSoundLineX = bufferedImage.width;
         }
-        const nowLine = Math.floor(soundLineX / NODE_SIZE);
-        const nextLine = Math.floor(nextSoundLineX / NODE_SIZE);
+        const nowLine = Math.floor(soundLineX / CELL_SIZE);
+        const nextLine = Math.floor(nextSoundLineX / CELL_SIZE);
         if (nowLine !== nextLine) {
-            p.playNodeSound(nextLine);
+            p.playCellSound(nextLine);
         }
         soundLineX = nextSoundLineX;
 
         bufferedImage.noStroke();
-        bufferedImage.fill(SOUND_NODE_COLOR);
-        for (let i = 0; i < nodeController.rowLength; i++) {
-            if (nodeController.nodeMap[i][nextLine]) {
-                bufferedImage.rect(nextLine * NODE_SIZE, i * NODE_SIZE, NODE_SIZE, NODE_SIZE)
+        bufferedImage.fill(SOUND_CELL_COLOR);
+        for (let i = 0; i < cellController.rowLength; i++) {
+            if (cellController.cellMap[i][nextLine]) {
+                bufferedImage.rect(nextLine * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             }
         }
 
         p.image(bufferedImage, p.windowWidth / 2, p.windowHeight / 2);
     };
 
-
-    p.playNodeSound = (nextLine) => {
+    /**
+     * 効果音再生
+     */
+    p.playCellSound = (nextLine) => {
         console.log("change");
-        for (let i = 0; i < nodeController.rowLength; i++) {
-            if (nodeController.nodeMap[i][nextLine]) {
-                const freq = p.midiToFreq(Math.floor(i * 64 / nodeController.rowLength) + 64);
+        for (let i = 0; i < cellController.rowLength; i++) {
+            if (cellController.cellMap[i][nextLine]) {
+                const freq = p.midiToFreq(Math.floor(i * 64 / cellController.rowLength) + 64);
                 oscList[i].freq(freq);
                 envelopeList[i].play(oscList[i], 0, 0.1);
             }
@@ -103,18 +105,21 @@ const sketch = p => {
         //変更されたウィンドウサイズに合わせてキャンバスのサイズを更新
         p.resizeCanvas(p.windowWidth, p.windowHeight);
         soundLineX = p.windowWidth - 1;
-        nodeController.initialize(p.windowWidth, p.windowHeight, NODE_SIZE);
-        bufferedImage.resizeCanvas((nodeController.columnLength - 2) * NODE_SIZE, (nodeController.rowLength - 2) * NODE_SIZE);
+        cellController.initialize(p.windowWidth, p.windowHeight, CELL_SIZE);
+        bufferedImage.resizeCanvas((cellController.columnLength - 2) * CELL_SIZE, (cellController.rowLength - 2) * CELL_SIZE);
         p.resetOsc();
     };
 
+    /**
+     * 発振器オブジェクトのリセット
+     */
     p.resetOsc = () => {
         oscList.forEach(osc => {
             osc.stop();
         });
         oscList.length = 0;
         envelopeList.length = 0;
-        for (let i = 0; i < nodeController.rowLength; i++) {
+        for (let i = 0; i < cellController.rowLength; i++) {
             const osc = new P5.SinOsc();
             osc.freq(0);
             osc.start();
