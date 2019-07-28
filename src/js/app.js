@@ -71,13 +71,13 @@ const sketch = p => {
                 }
             }
         }
-        bufferedImage.stroke(SOUND_LINE_COLOR);
-        bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height);
-
         //次のフレームのセルの状態を設定
         cellController.update();
 
         if (oscList.length > 0) {
+            bufferedImage.stroke(SOUND_LINE_COLOR);
+            bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height);
+
             let nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
             if (nextSoundLineX < 0) {
                 nextSoundLineX = bufferedImage.width;
@@ -125,7 +125,9 @@ const sketch = p => {
         soundLineX = p.windowWidth - 1;
         cellController.initialize(p.windowWidth, p.windowHeight, CELL_SIZE);
         bufferedImage.resizeCanvas((cellController.columnLength - 2) * CELL_SIZE, (cellController.rowLength - 2) * CELL_SIZE);
-        p.resetOsc();
+        if (oscList.length > 0) {
+            p.resetOsc();
+        }
     };
 
 

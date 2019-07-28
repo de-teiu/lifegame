@@ -100863,14 +100863,14 @@ var sketch = function sketch(p) {
           bufferedImage.rect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
       }
-    }
+    } //次のフレームのセルの状態を設定
 
-    bufferedImage.stroke(SOUND_LINE_COLOR);
-    bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height); //次のフレームのセルの状態を設定
 
     cellController.update();
 
     if (oscList.length > 0) {
+      bufferedImage.stroke(SOUND_LINE_COLOR);
+      bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height);
       var nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
 
       if (nextSoundLineX < 0) {
@@ -100922,7 +100922,10 @@ var sketch = function sketch(p) {
     soundLineX = p.windowWidth - 1;
     cellController.initialize(p.windowWidth, p.windowHeight, CELL_SIZE);
     bufferedImage.resizeCanvas((cellController.columnLength - 2) * CELL_SIZE, (cellController.rowLength - 2) * CELL_SIZE);
-    p.resetOsc();
+
+    if (oscList.length > 0) {
+      p.resetOsc();
+    }
   };
   /**
    * 発振器オブジェクトのリセット
