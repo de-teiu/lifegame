@@ -36,10 +36,25 @@ const sketch = p => {
         bufferedImage.fill(255);
 
         soundLineX = bufferedImage.width;
-        p.resetOsc();
         p.background(0);
 
+        if (
+            navigator.userAgent.indexOf("iPhone") > 0 ||
+            navigator.userAgent.indexOf("iPad") > 0 ||
+            navigator.userAgent.indexOf("iPod") > 0
+        ) {
+            p.touchStarted = p.startPlaySoundMode;
+        } else {
+            p.mouseClicked = p.startPlaySoundMode;
+        }
+
     };
+
+    p.startPlaySoundMode = () => {
+        if (oscList.length === 0) {
+            p.resetOsc();
+        }
+    }
 
     //画面描画処理
     p.draw = () => {
@@ -61,25 +76,29 @@ const sketch = p => {
 
         //次のフレームのセルの状態を設定
         cellController.update();
-        let nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
-        if (nextSoundLineX < 0) {
-            nextSoundLineX = bufferedImage.width;
-        }
-        const nowLine = Math.floor(soundLineX / CELL_SIZE);
-        const nextLine = Math.floor(nextSoundLineX / CELL_SIZE);
-        if (nowLine !== nextLine) {
-            p.playCellSound(nextLine);
-        }
-        soundLineX = nextSoundLineX;
 
-        bufferedImage.noStroke();
-        bufferedImage.fill(SOUND_CELL_COLOR);
-        for (let i = 0; i < cellController.rowLength; i++) {
-            if (cellController.cellMap[i][nextLine]) {
-                bufferedImage.rect(nextLine * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        if (oscList.length > 0) {
+            let nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
+            if (nextSoundLineX < 0) {
+                nextSoundLineX = bufferedImage.width;
+            }
+            const nowLine = Math.floor(soundLineX / CELL_SIZE);
+            const nextLine = Math.floor(nextSoundLineX / CELL_SIZE);
+            if (nowLine !== nextLine) {
+                p.playCellSound(nextLine);
+            }
+            soundLineX = nextSoundLineX;
+
+
+
+            bufferedImage.noStroke();
+            bufferedImage.fill(SOUND_CELL_COLOR);
+            for (let i = 0; i < cellController.rowLength; i++) {
+                if (cellController.cellMap[i][nextLine]) {
+                    bufferedImage.rect(nextLine * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                }
             }
         }
-
         p.image(bufferedImage, p.windowWidth / 2, p.windowHeight / 2);
     };
 
@@ -108,6 +127,8 @@ const sketch = p => {
         bufferedImage.resizeCanvas((cellController.columnLength - 2) * CELL_SIZE, (cellController.rowLength - 2) * CELL_SIZE);
         p.resetOsc();
     };
+
+
 
     /**
      * 発振器オブジェクトのリセット

@@ -100833,8 +100833,19 @@ var sketch = function sketch(p) {
     bufferedImage.noStroke();
     bufferedImage.fill(255);
     soundLineX = bufferedImage.width;
-    p.resetOsc();
     p.background(0);
+
+    if (navigator.userAgent.indexOf("iPhone") > 0 || navigator.userAgent.indexOf("iPad") > 0 || navigator.userAgent.indexOf("iPod") > 0) {
+      p.touchStarted = p.startPlaySoundMode;
+    } else {
+      p.mouseClicked = p.startPlaySoundMode;
+    }
+  };
+
+  p.startPlaySoundMode = function () {
+    if (oscList.length === 0) {
+      p.resetOsc();
+    }
   }; //画面描画処理
 
 
@@ -100858,26 +100869,29 @@ var sketch = function sketch(p) {
     bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height); //次のフレームのセルの状態を設定
 
     cellController.update();
-    var nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
 
-    if (nextSoundLineX < 0) {
-      nextSoundLineX = bufferedImage.width;
-    }
+    if (oscList.length > 0) {
+      var nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
 
-    var nowLine = Math.floor(soundLineX / CELL_SIZE);
-    var nextLine = Math.floor(nextSoundLineX / CELL_SIZE);
+      if (nextSoundLineX < 0) {
+        nextSoundLineX = bufferedImage.width;
+      }
 
-    if (nowLine !== nextLine) {
-      p.playCellSound(nextLine);
-    }
+      var nowLine = Math.floor(soundLineX / CELL_SIZE);
+      var nextLine = Math.floor(nextSoundLineX / CELL_SIZE);
 
-    soundLineX = nextSoundLineX;
-    bufferedImage.noStroke();
-    bufferedImage.fill(SOUND_CELL_COLOR);
+      if (nowLine !== nextLine) {
+        p.playCellSound(nextLine);
+      }
 
-    for (var _i = 0; _i < cellController.rowLength; _i++) {
-      if (cellController.cellMap[_i][nextLine]) {
-        bufferedImage.rect(nextLine * CELL_SIZE, _i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      soundLineX = nextSoundLineX;
+      bufferedImage.noStroke();
+      bufferedImage.fill(SOUND_CELL_COLOR);
+
+      for (var _i = 0; _i < cellController.rowLength; _i++) {
+        if (cellController.cellMap[_i][nextLine]) {
+          bufferedImage.rect(nextLine * CELL_SIZE, _i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
       }
     }
 
@@ -100964,7 +100978,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "12363" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "12536" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
