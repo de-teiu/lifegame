@@ -76,7 +76,7 @@ const sketch = p => {
 
         if (oscList.length > 0) {
             bufferedImage.stroke(SOUND_LINE_COLOR);
-            bufferedImage.line(soundLineX, 0, soundLineX, bufferedImage.height);
+            bufferedImage.line(soundLineX - CELL_SIZE, 0, soundLineX, bufferedImage.height);
 
             let nextSoundLineX = soundLineX - CELL_SIZE / 10 * 2;
             if (nextSoundLineX < 0) {
